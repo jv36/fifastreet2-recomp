@@ -244,7 +244,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     /* Step 1: Load XBE */
     if (!load_xbe(YOUR_GAME_XBE_PATH, &xbe_data, &xbe_size)) {
         MessageBoxA(NULL, "Failed to load default.xbe.\n"
-                    "Place the game files in the 'game' subdirectory.",
+                    "Run this executable from the project root, with the game "
+                    "files (default.xbe etc.) placed in the '" YOUR_GAME_DIR "' "
+                    "subdirectory next to src/.",
                     "Recomp", MB_ICONERROR);
         return 1;
     }

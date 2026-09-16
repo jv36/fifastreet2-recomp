@@ -45,6 +45,11 @@ game_files/
 *.swo
 *~
 
+# Runtime logs / crash dumps from running the recompiled exe
+*.log
+stderr.txt
+stdout.txt
+
 # OS
 Thumbs.db
 .DS_Store

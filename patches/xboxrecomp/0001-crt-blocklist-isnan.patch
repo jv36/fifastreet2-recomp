@@ -1,0 +1,26 @@
+From: fifastreet2-recomp
+Subject: [PATCH] tools/ghidra_naming: add isnan/isinf/etc to CRT collision blocklist
+
+Ghidra's Function ID matched Xbox VA 0x0026F501 to "isnan", which merge_names.py
+then wrote into functions.json as the function's real name. isnan is a
+math.h macro on MSVC (expands using sizeof to pick the float/double variant),
+so emitting "void isnan(void);" for the recompiled function breaks compilation
+of every generated .c file that includes recomp_funcs.h, plus every call site
+that also uses the real isnan() for NaN checks.
+
+C_STDLIB already suffixes known collisions (isdigit, malloc, strncat, ...)
+with the address, e.g. "isdigit_0026FF2A". isnan/isinf/isfinite/isnormal/
+signbit/fpclassify were missing from that list.
+
+diff --git a/tools/ghidra_naming/merge_names.py b/tools/ghidra_naming/merge_names.py
+index f9d94f0..693d364 100644
+--- a/tools/ghidra_naming/merge_names.py
++++ b/tools/ghidra_naming/merge_names.py
+@@ -142,6 +142,7 @@ strnicmp stricmp strcmpi stricoll strlwr strupr strrev strset strnset
+ itoa ltoa ultoa ecvt fcvt gcvt swab
+ logb logbf scalb scalbn ilogb significand drem j0 j1 jn y0 y1 yn gamma
+ _ftol _ftol2 _alldiv _aulldiv _allmul _allrem _aullrem _allshl _allshr _aullshr
++isnan isinf isfinite isnormal signbit fpclassify
+ """.split())
+ 
+ RESERVED = C_KEYWORDS | C_STDLIB

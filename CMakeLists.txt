@@ -23,14 +23,9 @@ add_compile_definitions(
 
 # ── xboxrecomp toolkit ──────────────────────────────────────────
 #
-# Option A: xboxrecomp as a subdirectory (simplest)
-#   Place xboxrecomp/ next to your game project and use a relative path.
-#
-# Option B: find_package (if you install xboxrecomp system-wide)
-#   find_package(xboxrecomp REQUIRED)
-#
-# Adjust this path to point to your xboxrecomp clone:
-set(XBOXRECOMP_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../xboxrecomp" CACHE PATH
+# Vendored as a pinned git submodule at ./xboxrecomp (see scripts/setup.ps1,
+# which also applies the patches in patches/xboxrecomp/ on top of it).
+set(XBOXRECOMP_DIR "${CMAKE_CURRENT_SOURCE_DIR}/xboxrecomp" CACHE PATH
     "Path to the xboxrecomp toolkit root directory")
 
 # Add xboxrecomp as a subdirectory -- this builds all 6 runtime libraries

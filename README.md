@@ -1,38 +1,29 @@
-# FIFA Street 2 - Static Recompilation for Windows 11
+![fifa street 2 logo](docs/images/logo.png)
+# fifastreet2-recomp
 
-Static recompilation of the original Xbox version of **FIFA Street 2** (2006,
-EA Big / EA Canada) into a native Windows x86-64 executable, built with the
-[xboxrecomp](https://github.com/sp00nznet/xboxrecomp) toolkit.
+An attempt of a static recompilation of the Xbox version of FIFA Street 2 into a native Windows version, built with the [xboxrecomp](https://github.com/sp00nznet/xboxrecomp) toolkit.
 
-No emulation, no interpreter — every function in the original `.text` section
-is disassembled once and translated to C, which is then compiled straight to
-native code by MSVC.
 
-This project is inspired by (and stands on the toolkit shared with)
-[sp00nznet/burnout3](https://github.com/sp00nznet/burnout3) and
-[GTTeancum/OpenXML1xbox](https://github.com/GTTeancum/OpenXML1xbox), two other
-static recompilations built on top of `xboxrecomp`.
+This videogame is a wonderful childhood memory and I hope this ambitious project may resonate with some other people.
 
 ## Status
 
-Boots, initializes the Xbox kernel shim and memory layout, and reaches the
-recompiled entry point. Rendering/gameplay bring-up is in progress — see
-[Debugging](#debugging-iteratively) below.
+Boots, initializes the Xbox kernel shim and memory layout, reaches the
+recompiled entry point. A window does not show up and the process has to be manually killed or scheduled via watchdog.
 
-## Target Game
+## Game useful info
 
 | | |
 |---|---|
 | Title | FIFA Street 2 |
 | Title ID | `0x45410085` |
-| Platform | Xbox (Original) |
-| XDK Version | 5849 |
+| XDK version | 5849 |
 | Build date | 2006-01-11 |
 | Entry point | `0x0024D87E` |
 | Code size | ~2.44 MB (`.text`) |
 | Functions | 15,314 recompiled (`src/recomp/gen/`, 16 split files) |
 
-## Project Structure
+## Project structure
 
 ```
 fifastreet2-recomp/
@@ -55,8 +46,7 @@ fifastreet2-recomp/
 - Visual Studio 2022 with the C/C++ desktop workload (MSVC)
 - CMake 3.20+
 - Python 3.10+ with `capstone` installed (`pip install capstone`)
-- Your own legally-owned FIFA Street 2 (Xbox) disc, extracted to `game_files/`
-  (not included in this repo — see [Legal Notice](#legal-notice))
+- Your own legally-owned FIFA Street 2 disc, extracted to `game_files/` (not included in this repo, see [legal notice](#legal-notice))
 
 ## Setup
 
@@ -76,17 +66,16 @@ patches are fixes this project needed in `xboxrecomp` itself (see
 [patches/xboxrecomp](patches/xboxrecomp)); re-run the script any time a new
 patch is added, it skips ones already applied.
 
-## Extract Game Files
+## Extract game files
 
 Extract `default.xbe` and the data files from your disc image into
-`game_files/` using [extract-xiso](https://github.com/XboxDev/extract-xiso) or
-[xdvdfs](https://github.com/antangelo/xdvdfs):
+`game_files/` using [extract-xiso](https://github.com/XboxDev/extract-xiso):
 
 ```powershell
 extract-xiso -x "FIFA Street 2.iso" -d game_files/
 ```
 
-## Regenerating the Recompiled Code
+## Regenerating the recompiled code
 
 `src/recomp/gen/` is gitignored and generated from the XBE. You only need to
 redo this if you change the toolkit's lifter/disassembler or want to pick up
@@ -117,10 +106,10 @@ cd ..
 ```
 
 See [xboxrecomp/docs/GETTING_STARTED.md](xboxrecomp/docs/GETTING_STARTED.md)
-for the full walkthrough of each step, including what to do when a step fails.
+for the full walkthrough of each step, including what to do when a step fails. Step 4 also needs extra Ghidra configs and you can check them out there: I am not familiar with this tool (at least for now... :)
 
 ## Building
-
+Be sure to build this with the correct `CMakeLists.txt`.
 ```powershell
 cmake -S . -B build
 cmake --build build --config Release
@@ -128,41 +117,19 @@ cmake --build build --config Release
 
 ## Running
 
-Run from the repo root — the game files must already be under `game_files/`,
+Run from the repo root - the game files must already be under `game_files/`,
 matching `YOUR_GAME_DIR` in [src/main.c](src/main.c):
 
 ```powershell
 build\Release\fifastreet2.exe 2>stderr.txt
 ```
+## Legal notice
 
-It will likely crash the first few times; that's expected. Check `stderr.txt`
-for ICALL failures, bad memory accesses, or missing kernel functions, per the
-[Debugging](#debugging-iteratively) workflow below.
+Note that this repo and project will **NEVER** provide any game files and these must come from a legally owned copy. This project aims to help preservating a game that never had a PC version, and to improve my reverse engineering and C skills.
 
-## Debugging Iteratively
+## References and inspirations
 
-1. Run — note where it crashes or what it prints to `stderr.txt`.
-2. Identify the cause: missing ICALL target, unmapped memory access,
-   unimplemented kernel function, or a bad lift.
-3. Add a fix — a manual override in [src/recomp_manual.c](src/recomp_manual.c),
-   a dispatch table entry, or a kernel stub.
-4. Rebuild and repeat.
-
-See [xboxrecomp/docs/technical/indirect-calls.md](xboxrecomp/docs/technical/indirect-calls.md)
-and [xboxrecomp/docs/technical/lessons-learned.md](xboxrecomp/docs/technical/lessons-learned.md).
-
-## Legal Notice
-
-This project is for educational and preservation purposes. You must own a
-legitimate copy of FIFA Street 2 for Xbox to use it. No original game assets
-or copyrighted code are included in this repository — `game_files/` and
-`src/recomp/gen/` are gitignored and must be produced locally from your own
-disc image.
-
-## References
-
-- [xboxrecomp](https://github.com/sp00nznet/xboxrecomp) — the toolkit this project is built on
-- [sp00nznet/burnout3](https://github.com/sp00nznet/burnout3) — Burnout 3: Takedown recompilation
-- [GTTeancum/OpenXML1xbox](https://github.com/GTTeancum/OpenXML1xbox) — X-Men Legends recompilation
-- [XBE File Format](https://xboxdevwiki.net/Xbe) — Xbox Dev Wiki
-- [Xbox Kernel Exports](https://xboxdevwiki.net/Kernel) — Xbox Dev Wiki
+- [xboxrecomp](https://github.com/sp00nznet/xboxrecomp) - the toolkit this project is built on
+- [sp00nznet/burnout3](https://github.com/sp00nznet/burnout3) - Burnout 3: Takedown recompilation
+- [GTTeancum/OpenXML1xbox](https://github.com/GTTeancum/OpenXML1xbox) - X-Men Legends recompilation
+- ...all other awesome recomp projects!
